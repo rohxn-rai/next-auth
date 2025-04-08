@@ -1,5 +1,8 @@
-import AuthForm from '@/components/auth-form';
+import AuthForm from "@/components/auth-form";
 
-export default async function Home() {
-  return <AuthForm />;
-}
+const Home = async ({ searchParams }) => {
+  const formMode = searchParams.mode || "login";
+  return <AuthForm mode={formMode} />;
+};
+
+export default Home;
