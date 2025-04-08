@@ -3,8 +3,8 @@
 import { redirect } from "next/navigation";
 
 import { createAuthSession } from "@/lib/auth";
-import { hashUserPassword } from "@/lib/hash";
-import { createUser } from "@/lib/user";
+import { hashUserPassword, verifyPassword } from "@/lib/hash";
+import { createUser, getUserByEmail } from "@/lib/user";
 
 export const signup = async (prevState, actionData) => {
   const email = actionData.get("email");
@@ -42,4 +42,32 @@ export const signup = async (prevState, actionData) => {
     }
     throw error;
   }
+};
+
+export const login = async (prevState, FormData) => {
+  const email = FormData.get("email");
+  const password = FormData.get("password");
+
+  const existingUser = getUserByEmail(email);
+
+  if (!existingUser) {
+    return {
+      errors: {
+        email: "Could not find a user with this email address.",
+      },
+    };
+  }
+
+  const isValidPassword = verifyPassword(existingUser.password, password);
+
+  if (!isValidPassword) {
+    return {
+      errors: {
+        email: "Could not authenticate user, please check your credentials.",
+      },
+    };
+  }
+
+  await createAuthSession(id);
+  redirect("/training");
 };
